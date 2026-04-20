@@ -495,9 +495,9 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    cursor: help;
   }
-
-  .person-cell { display: flex; align-items: center; gap: 6px; }
+.person-cell { display: flex; align-items: center; gap: 6px; }
   .mini-avatar {
     width: 24px; height: 24px;
     border-radius: 50%;
@@ -1318,6 +1318,14 @@ function personCell(name, email) {
   return `<div class="person-cell"><div class="mini-avatar" style="background:${color};">${ini}</div><div><div class="person-name">${name}</div><div class="person-email">${email}</div></div></div>`;
 }
 
+function escapeHtmlAttr(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 // ── DASHBOARD FILTERS ──
 let filteredTasks = [...tasks];
 
@@ -1358,7 +1366,7 @@ function renderTable() {
     <tr>
       <td><div class="date-cell">${index + 1}</div></td>
       <td><div class="task-name">${t.name}</div></td>
-      <td><div class="task-desc">${t.desc}</div></td>
+      <td><div class="task-desc" title="${escapeHtmlAttr(t.desc)}">${t.desc}</div></td>
       <td>${personCell(t.creator, t.creatorEmail)}</td>
       <td>${personCell(t.assignee, t.assigneeEmail)}</td>
       <td><div class="date-cell">${fmtDate(t.dueDate)}</div></td>
@@ -1401,7 +1409,7 @@ function renderTable2() {
     <tr>
       <td><div class="date-cell">${index + 1}</div></td>
       <td><div class="task-name">${t.name}</div></td>
-      <td><div class="task-desc">${t.desc}</div></td>
+      <td><div class="task-desc" title="${escapeHtmlAttr(t.desc)}">${t.desc}</div></td>
       <td>${personCell(t.creator, t.creatorEmail)}</td>
       <td>${personCell(t.assignee, t.assigneeEmail)}</td>
       <td><div class="date-cell">${fmtDate(t.dueDate)}</div></td>
@@ -1604,33 +1612,44 @@ function updateStats() {
 let donutChart, barChart;
 
 function initCharts() {
-  const arr = tasks;
-  const pending = arr.filter(t => t.status === 'ยังไม่เริ่ม').length;
-  const progress = arr.filter(t => t.status === 'กำลังดำเนินการ').length;
+  const arr = filteredTasks;
+  const overdue = arr.filter(t => isOverdue(t)).length;
+  const progress = arr.filter(t => t.status === 'กำลังดำเนินการ' && !isOverdue(t)).length;
   const done = arr.filter(t => t.status === 'เสร็จเรียบร้อย').length;
 
   donutChart = new Chart(document.getElementById('donutChart').getContext('2d'), {
     type:'doughnut',
-    data:{labels: ['เลยกำหนด', 'กำลังดำเนินการ', 'เสร็จเรียบร้อย'],datasets:[{data:[pending,progress,done],backgroundColor: [COLORS.overdue, COLORS.progress, COLORS.done],borderWidth:0,hoverOffset:6}]},
+    data:{labels:['เลยกำหนด','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{data:[overdue,progress,done],backgroundColor:[COLORS.overdue,COLORS.progress,COLORS.done],borderWidth:0,hoverOffset:6}]},
     options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} งาน`}}}}
   });
 
   barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
     type:'bar',
-    data:{labels: ['เลยกำหนด', 'กำลังดำเนินการ', 'เสร็จเรียบร้อย'],datasets:[{label:'จำนวนงาน',data:[pending,progress,done],backgroundColor: [COLORS.overdue, COLORS.progress, COLORS.done],borderRadius:8,borderSkipped:false,maxBarThickness:55}]},
+    data:{labels:['เลยกำหนด','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{label:'จำนวนงาน',data:[overdue,progress,done],backgroundColor:[COLORS.overdue,COLORS.progress,COLORS.done],borderRadius:8,borderSkipped:false,maxBarThickness:55}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y} งาน`}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Sarabun',size:11}},grid:{color:'rgba(61,122,85,0.07)'},border:{display:false}},x:{ticks:{font:{family:'Sarabun',size:11}},grid:{display:false},border:{display:false}}}}
   });
 }
 
 function updateCharts() {
   const arr = filteredTasks;
-  const pending = arr.filter(t=>t.status==='ยังไม่เริ่ม').length;
-  const progress = arr.filter(t=>t.status==='กำลังดำเนินการ').length;
-  const done = arr.filter(t=>t.status==='เสร็จเรียบร้อย').length;
-  donutChart.data.datasets[0].data = [pending,progress,done];
+  const overdue = arr.filter(t => isOverdue(t)).length;
+  const progress = arr.filter(t => t.status === 'กำลังดำเนินการ' && !isOverdue(t)).length;
+  const done = arr.filter(t => t.status === 'เสร็จเรียบร้อย').length;
+
+  donutChart.data.datasets[0].data = [overdue, progress, done];
   donutChart.update();
-  barChart.data.datasets[0].data = [pending,progress,done];
+
+  barChart.data.datasets[0].data = [overdue, progress, done];
   barChart.update();
+
+  const total = arr.length;
+  const pct = n => total ? ((n / total) * 100).toFixed(1) + '%' : '0%';
+  const legPending = document.getElementById('legPending');
+  const legProgress = document.getElementById('legProgress');
+  const legDone = document.getElementById('legDone');
+  if (legPending) legPending.textContent = `${overdue} (${pct(overdue)})`;
+  if (legProgress) legProgress.textContent = `${progress} (${pct(progress)})`;
+  if (legDone) legDone.textContent = `${done} (${pct(done)})`;
 }
 
 // ── MODAL (ADD/EDIT) ──
@@ -1730,7 +1749,7 @@ filteredTasks = [...tasks];
 filteredTasks2 = [...tasks];
 renderTable();
 updateStats();
-window.addEventListener('load', initCharts);
+window.addEventListener('load', () => { initCharts(); updateCharts(); });
 </script>
 </body>
 </html>
