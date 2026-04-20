@@ -541,6 +541,12 @@
   }
   .badge-done .badge-dot { background: #22c55e; }
 
+  .badge-overdue {
+    background: rgba(226,75,74,0.12);
+    color: #b42318;
+  }
+  .badge-overdue .badge-dot { background: #e24b4a; }
+
   .date-cell { font-size: 0.75rem; color: var(--text-soft); white-space: nowrap; }
 
   .action-btn {
@@ -819,9 +825,9 @@
         <div class="stat-icon">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
         </div>
-        <div class="stat-value" id="statPending">4</div>
-        <div class="stat-label">ยังไม่เริ่ม</div>
-        <div class="stat-pct" id="statPendingPct">57.1%</div>
+        <div class="stat-value" id="statPending">0</div>
+        <div class="stat-label">เลยกำหนด</div>
+        <div class="stat-pct" id="statPendingPct">0%</div>
       </div>
       <div class="stat-card in-progress">
         <div class="stat-icon">
@@ -854,7 +860,7 @@
           <canvas id="donutChart"></canvas>
         </div>
         <div class="legend" id="donutLegend">
-          <div class="legend-item"><div class="legend-dot" style="background:#c8893a;"></div><span>ยังไม่เริ่ม</span><span style="margin-left:auto;font-weight:600;" id="legPending">4 (57.1%)</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#e24b4a;"></div><span>เลยกำหนด</span><span style="margin-left:auto;font-weight:600;" id="legPending">0 (0%)</span></div>
           <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div><span>กำลังดำเนินการ</span><span style="margin-left:auto;font-weight:600;" id="legProgress">2 (28.6%)</span></div>
           <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div><span>เสร็จเรียบร้อย</span><span style="margin-left:auto;font-weight:600;" id="legDone">1 (14.3%)</span></div>
         </div>
@@ -896,15 +902,13 @@
         <table id="taskTable">
           <thead>
             <tr>
-              <th>วันที่สร้าง</th>
-              <th>ID งาน</th>
+              <th>ลำดับที่</th>
               <th>ชื่องาน</th>
               <th>รายละเอียด</th>
               <th>สร้างโดย</th>
               <th>ผู้รับผิดชอบ</th>
               <th>วันครบกำหนด</th>
               <th>สถานะ</th>
-              <th>แก้ไขล่าสุด</th>
               <th></th>
             </tr>
           </thead>
@@ -944,15 +948,13 @@
           <table>
             <thead>
               <tr>
-                <th>วันที่สร้าง</th>
-                <th>ID งาน</th>
+                <th>ลำดับที่</th>
                 <th>ชื่องาน</th>
                 <th>รายละเอียด</th>
                 <th>สร้างโดย</th>
                 <th>ผู้รับผิดชอบ</th>
                 <th>วันครบกำหนด</th>
                 <th>สถานะ</th>
-                <th>แก้ไขล่าสุด</th>
                 <th></th>
               </tr>
             </thead>
@@ -974,7 +976,7 @@
     <div id="view-reports" style="display:none;">
       <div class="stats-row" style="margin-bottom:1.5rem;">
         <div class="stat-card total"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-value" id="rTotal">7</div><div class="stat-label">Task รวม</div></div>
-        <div class="stat-card pending"><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><div class="stat-value" id="rPending">4</div><div class="stat-label">ยังไม่เริ่ม</div></div>
+        <div class="stat-card pending"><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><div class="stat-value" id="rPending">0</div><div class="stat-label">เลยกำหนด</div></div>
         <div class="stat-card in-progress"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.5 7.54L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.5 2.47C6.81 18 5 15.21 5 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg></div><div class="stat-value" id="rProgress">2</div><div class="stat-label">กำลังดำเนินการ</div></div>
         <div class="stat-card done"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="stat-value" id="rDone">1</div><div class="stat-label">เสร็จเรียบร้อย</div></div>
       </div>
@@ -983,7 +985,7 @@
           <div class="chart-header"><div><div class="chart-title">สัดส่วนสถานะงาน</div><div class="chart-subtitle">Donut Chart</div></div></div>
           <div class="donut-wrap"><canvas id="donutChart2"></canvas></div>
           <div class="legend">
-            <div class="legend-item"><div class="legend-dot" style="background:#c8893a;"></div><span>ยังไม่เริ่ม</span><span style="margin-left:auto;font-weight:600;" id="rLegPending">-</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#c8893a;"></div><span>เลยกำหนด</span><span style="margin-left:auto;font-weight:600;" id="rLegPending">0 (0%)</span></div>
             <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div><span>กำลังดำเนินการ</span><span style="margin-left:auto;font-weight:600;" id="rLegProgress">-</span></div>
             <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div><span>เสร็จเรียบร้อย</span><span style="margin-left:auto;font-weight:600;" id="rLegDone">-</span></div>
           </div>
@@ -1144,7 +1146,8 @@
 const COLORS = {
   pending: '#c8893a',
   progress: '#3b82f6',
-  done: '#22c55e'
+  done: '#22c55e',
+  overdue: '#e24b4a'
 };
 
 const avatarColors = ['#2d5a3f','#3b82f6','#c8893a','#a855f7','#ec4899','#14b8a6'];
@@ -1163,13 +1166,13 @@ function initials(name) {
 }
 
 let tasks = [
-  {id:'d5ea4880', created:'2024-11-09', name:'งานจัดคอนเสิร์ต', desc:'จัดงานขอบคุณลูกค้า ให้กับบริษัท - โดยให้จัดสิ้นปีให้ลูกค้าสั่งการ - มี booth food truck - มีแสงสีเสียงครบชุด', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-20', status:'กำลังดำเนินการ', updated:'2024-11-09'},
-  {id:'8e46bb5d', created:'2024-11-09', name:'ทดสอบ', desc:'ทดสอบ - เสร็จเรียบร้อยแล้ว ทดสอบนี้มีเรียนรู้ทำไปบ้างแล้ว อยากให้', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-15', status:'เสร็จเรียบร้อย', updated:'2024-11-10'},
-  {id:'84078635', created:'2024-11-09', name:'ทดสอบ2', desc:'ทดสอบ2', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', dueDate:'2024-11-18', status:'ยังไม่เริ่ม', updated:'2024-11-09'},
-  {id:'23af98d6', created:'2024-11-10', name:'งานจัดนิทรรศการ', desc:'งานจัดนิทรรศการ รายละเอียด', creator:'แดง-นรินทร์', creatorEmail:'red@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-25', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
-  {id:'402d75ff', created:'2024-11-06', name:'สไลด์ present งานสินค้า', desc:'สไลด์ present งานสินค้า', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', dueDate:'2024-11-22', status:'กำลังดำเนินการ', updated:'2024-11-10'},
-  {id:'96ef5b76', created:'2024-11-10', name:'งานใหม่', desc:'งานใหม่', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-28', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
-  {id:'45b77924', created:'2024-11-10', name:'ทดสอบ23', desc:'ทดสอบ23', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-30', status:'ยังไม่เริ่ม', updated:'2024-11-10'}
+  {id:'d5ea4880', created:'2024-11-09', dueDate:'2024-11-20', name:'งานจัดคอนเสิร์ต', desc:'จัดงานขอบคุณลูกค้า ให้กับบริษัท - โดยให้จัดสิ้นปีให้ลูกค้าสั่งการ - มี booth food truck - มีแสงสีเสียงครบชุด', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-20', status:'กำลังดำเนินการ', updated:'2024-11-09'},
+  {id:'8e46bb5d', created:'2024-11-09', dueDate:'2024-11-12', name:'ทดสอบ', desc:'ทดสอบ - เสร็จเรียบร้อยแล้ว ทดสอบนี้มีเรียนรู้ทำไปบ้างแล้ว อยากให้', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-15', status:'เสร็จเรียบร้อย', updated:'2024-11-10'},
+  {id:'84078635', created:'2024-11-09', dueDate:'2024-11-14', name:'ทดสอบ2', desc:'ทดสอบ2', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', dueDate:'2024-11-18', status:'ยังไม่เริ่ม', updated:'2024-11-09'},
+  {id:'23af98d6', created:'2024-11-10', dueDate:'2024-11-16', name:'งานจัดนิทรรศการ', desc:'งานจัดนิทรรศการ รายละเอียด', creator:'แดง-นรินทร์', creatorEmail:'red@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-25', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
+  {id:'402d75ff', created:'2024-11-06', dueDate:'2024-11-18', name:'สไลด์ present งานสินค้า', desc:'สไลด์ present งานสินค้า', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', dueDate:'2024-11-22', status:'กำลังดำเนินการ', updated:'2024-11-10'},
+  {id:'96ef5b76', created:'2024-11-10', dueDate:'2024-11-25', name:'งานใหม่', desc:'งานใหม่', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-28', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
+  {id:'45b77924', created:'2024-11-10', dueDate:'2024-11-27', name:'ทดสอบ23', desc:'ทดสอบ23', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-30', status:'ยังไม่เริ่ม', updated:'2024-11-10'}
 ];
 
 let editIndex = null;
@@ -1214,7 +1217,7 @@ const viewTitles = {
   dashboard: 'Tracking Management Dashboard',
   tasks: 'งานทั้งหมด',
   assignees: 'ผู้รับผิดชอบ',
-  reports: 'Tracking Management Dashboard',
+  reports: 'รายงานสรุป',
   settings: 'ตั้งค่าระบบ'
 };
 
@@ -1282,7 +1285,26 @@ function fmtDate(d) {
   return `${parseInt(day)}/${parseInt(m)}/${y}`;
 }
 
+function todayStr() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function isOverdue(task) {
+  if (!task.dueDate) return false;
+  if (task.status === 'เสร็จเรียบร้อย') return false;
+  return task.dueDate < todayStr();
+}
+
+function getDisplayStatus(task) {
+  return isOverdue(task) ? 'เลยกำหนด' : task.status;
+}
+
 function statusBadge(s) {
+  if (s === 'เลยกำหนด') return `<span class="badge badge-overdue"><span class="badge-dot"></span>${s}</span>`;
   if (s === 'ยังไม่เริ่ม') return `<span class="badge badge-pending"><span class="badge-dot"></span>${s}</span>`;
   if (s === 'กำลังดำเนินการ') return `<span class="badge badge-progress"><span class="badge-dot"></span>${s}</span>`;
   return `<span class="badge badge-done"><span class="badge-dot"></span>${s}</span>`;
@@ -1330,17 +1352,15 @@ function renderTable() {
   document.getElementById('tableCount').textContent = `แสดง ${filteredTasks.length} รายการ`;
   if (filteredTasks.length === 0) { body.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display = 'none';
-  body.innerHTML = filteredTasks.map(t => `
+  body.innerHTML = filteredTasks.map((t, index) => `
     <tr>
-      <td><div class="date-cell">${fmtDate(t.created)}</div></td>
-      <td><span class="task-id">${t.id.slice(0,8)}</span></td>
+      <td><div class="date-cell">${index + 1}</div></td>
       <td><div class="task-name">${t.name}</div></td>
       <td><div class="task-desc">${t.desc}</div></td>
       <td>${personCell(t.creator, t.creatorEmail)}</td>
       <td>${personCell(t.assignee, t.assigneeEmail)}</td>
       <td><div class="date-cell">${fmtDate(t.dueDate)}</div></td>
-      <td>${statusBadge(t.status)}</td>
-      <td><div class="date-cell">${fmtDate(t.updated)}</div></td>
+      <td>${statusBadge(getDisplayStatus(t))}</td>
       <td>
         <div style="display:flex;gap:4px;">
           <button class="action-btn" title="แก้ไข" onclick="editTask(${tasks.indexOf(t)})">
@@ -1375,17 +1395,15 @@ function renderTable2() {
   document.getElementById('tableCount2').textContent = `แสดง ${filteredTasks2.length} รายการ`;
   if (filteredTasks2.length === 0) { body.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display='none';
-  body.innerHTML = filteredTasks2.map(t => `
+  body.innerHTML = filteredTasks2.map((t, index) => `
     <tr>
-      <td><div class="date-cell">${fmtDate(t.created)}</div></td>
-      <td><span class="task-id">${t.id.slice(0,8)}</span></td>
+      <td><div class="date-cell">${index + 1}</div></td>
       <td><div class="task-name">${t.name}</div></td>
       <td><div class="task-desc">${t.desc}</div></td>
       <td>${personCell(t.creator, t.creatorEmail)}</td>
       <td>${personCell(t.assignee, t.assigneeEmail)}</td>
       <td><div class="date-cell">${fmtDate(t.dueDate)}</div></td>
-      <td>${statusBadge(t.status)}</td>
-      <td><div class="date-cell">${fmtDate(t.updated)}</div></td>
+      <td>${statusBadge(getDisplayStatus(t))}</td>
       <td>
         <div style="display:flex;gap:4px;">
           <button class="action-btn" title="แก้ไข" onclick="editTask(${tasks.indexOf(t)})">
@@ -1501,52 +1519,83 @@ let donutChart2, barChart2;
 
 function renderReports() {
   const total = tasks.length;
-  const pending = tasks.filter(t=>t.status==='ยังไม่เริ่ม').length;
-  const progress = tasks.filter(t=>t.status==='กำลังดำเนินการ').length;
-  const done = tasks.filter(t=>t.status==='เสร็จเรียบร้อย').length;
+  const overdue = tasks.filter(t => isOverdue(t)).length;
+  const progress = tasks.filter(t => t.status === 'กำลังดำเนินการ' && !isOverdue(t)).length;
+  const done = tasks.filter(t => t.status === 'เสร็จเรียบร้อย').length;
+  const pct = n => total ? ((n / total) * 100).toFixed(1) + '%' : '0%';
+
   document.getElementById('rTotal').textContent = total;
-  document.getElementById('rPending').textContent = pending;
+  document.getElementById('rPending').textContent = overdue;
   document.getElementById('rProgress').textContent = progress;
   document.getElementById('rDone').textContent = done;
-  const pct = v => total ? (v/total*100).toFixed(1)+'%' : '0%';
-  document.getElementById('rLegPending').textContent = `${pending} (${pct(pending)})`;
+  document.getElementById('rLegPending').textContent = `${overdue} (${pct(overdue)})`;
   document.getElementById('rLegProgress').textContent = `${progress} (${pct(progress)})`;
   document.getElementById('rLegDone').textContent = `${done} (${pct(done)})`;
 
-  if (donutChart2) donutChart2.destroy();
-  if (barChart2) barChart2.destroy();
+  if (window.donutChart2Instance) window.donutChart2Instance.destroy();
+  if (window.barChart2Instance) window.barChart2Instance.destroy();
 
-  donutChart2 = new Chart(document.getElementById('donutChart2').getContext('2d'), {
-    type:'doughnut',
-    data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderWidth:0,hoverOffset:6}]},
-    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} งาน`}}}}
-  });
+  const donutCtx2 = document.getElementById('donutChart2');
+  if (donutCtx2) {
+    window.donutChart2Instance = new Chart(donutCtx2, {
+      type: 'doughnut',
+      data: {
+        labels: ['เลยกำหนด', 'กำลังดำเนินการ', 'เสร็จเรียบร้อย'],
+        datasets: [{
+          data: [overdue, progress, done],
+          backgroundColor: [COLORS.overdue, COLORS.progress, COLORS.done],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
 
-  barChart2 = new Chart(document.getElementById('barChart2').getContext('2d'), {
-    type:'bar',
-    data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{label:'จำนวนงาน',data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderRadius:8,borderSkipped:false,maxBarThickness:55}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} งาน`}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Sarabun',size:11}},grid:{color:'rgba(61,122,85,0.07)'},border:{display:false}},x:{ticks:{font:{family:'Sarabun',size:11}},grid:{display:false},border:{display:false}}}}
-  });
+  const barCtx2 = document.getElementById('barChart2');
+  if (barCtx2) {
+    window.barChart2Instance = new Chart(barCtx2, {
+      type: 'bar',
+      data: {
+        labels: ['เลยกำหนด', 'กำลังดำเนินการ', 'เสร็จเรียบร้อย'],
+        datasets: [{
+          data: [overdue, progress, done],
+          backgroundColor: [COLORS.overdue, COLORS.progress, COLORS.done],
+          borderRadius: 8,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
+  }
 }
 
 // ── STATS ──
 function updateStats() {
-  const arr = filteredTasks;
-  const total = arr.length;
-  const pending = arr.filter(t => t.status === 'ยังไม่เริ่ม').length;
-  const progress = arr.filter(t => t.status === 'กำลังดำเนินการ').length;
-  const done = arr.filter(t => t.status === 'เสร็จเรียบร้อย').length;
+  const total = filteredTasks.length;
+  const pending = filteredTasks.filter(t => t.status === 'ยังไม่เริ่ม' && !isOverdue(t)).length;
+  const progress = filteredTasks.filter(t => t.status === 'กำลังดำเนินการ' && !isOverdue(t)).length;
+  const done = filteredTasks.filter(t => t.status === 'เสร็จเรียบร้อย').length;
+  const overdue = filteredTasks.filter(t => isOverdue(t)).length;
+
   document.getElementById('statTotal').textContent = total;
-  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statPending').textContent = overdue;
   document.getElementById('statProgress').textContent = progress;
   document.getElementById('statDone').textContent = done;
-  const pct = v => total ? (v/total*100).toFixed(1)+'%' : '0%';
-  document.getElementById('statPendingPct').textContent = pct(pending);
+
+  const pct = n => total ? ((n / total) * 100).toFixed(1) + '%' : '0%';
+  document.getElementById('statPendingPct').textContent = pct(overdue);
   document.getElementById('statProgressPct').textContent = pct(progress);
   document.getElementById('statDonePct').textContent = pct(done);
-  document.getElementById('legPending').textContent = `${pending} (${pct(pending)})`;
-  document.getElementById('legProgress').textContent = `${progress} (${pct(progress)})`;
-  document.getElementById('legDone').textContent = `${done} (${pct(done)})`;
 }
 
 // ── CHARTS ──
@@ -1560,13 +1609,13 @@ function initCharts() {
 
   donutChart = new Chart(document.getElementById('donutChart').getContext('2d'), {
     type:'doughnut',
-    data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderWidth:0,hoverOffset:6}]},
+    data:{labels: ['เลยกำหนด', 'กำลังดำเนินการ', 'เสร็จเรียบร้อย'],datasets:[{data:[pending,progress,done],backgroundColor: [COLORS.overdue, COLORS.progress, COLORS.done],borderWidth:0,hoverOffset:6}]},
     options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} งาน`}}}}
   });
 
   barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
     type:'bar',
-    data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{label:'จำนวนงาน',data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderRadius:8,borderSkipped:false,maxBarThickness:55}]},
+    data:{labels: ['เลยกำหนด', 'กำลังดำเนินการ', 'เสร็จเรียบร้อย'],datasets:[{label:'จำนวนงาน',data:[pending,progress,done],backgroundColor: [COLORS.overdue, COLORS.progress, COLORS.done],borderRadius:8,borderSkipped:false,maxBarThickness:55}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y} งาน`}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Sarabun',size:11}},grid:{color:'rgba(61,122,85,0.07)'},border:{display:false}},x:{ticks:{font:{family:'Sarabun',size:11}},grid:{display:false},border:{display:false}}}}
   });
 }
