@@ -1168,7 +1168,39 @@ let tasks = [
 
 let editIndex = null;
 let pendingEditIndex = null;
+const STORAGE_KEYS = {
+  tasks: 'taskTracker_tasks_v1',
+  password: 'taskTracker_password_v1'
+};
 let appPassword = '1234';
+
+function persistAppState() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
+    localStorage.setItem(STORAGE_KEYS.password, appPassword);
+  } catch (error) {
+    console.error('Save failed:', error);
+    showToast('ไม่สามารถบันทึกข้อมูลในเครื่องนี้ได้');
+  }
+}
+
+function loadAppState() {
+  try {
+    const savedTasks = localStorage.getItem(STORAGE_KEYS.tasks);
+    const savedPassword = localStorage.getItem(STORAGE_KEYS.password);
+
+    if (savedTasks) {
+      const parsed = JSON.parse(savedTasks);
+      if (Array.isArray(parsed)) tasks = parsed;
+    }
+
+    if (savedPassword) {
+      appPassword = savedPassword;
+    }
+  } catch (error) {
+    console.error('Load failed:', error);
+  }
+}
 
 // ── VIEW SWITCHING ──
 const views = ['dashboard','tasks','assignees','reports','settings'];
@@ -1227,6 +1259,7 @@ function changePassword() {
   if (!nw) { msg.style.color='#e24b4a'; msg.textContent='กรุณาใส่รหัสผ่านใหม่'; return; }
   if (nw !== cf) { msg.style.color='#e24b4a'; msg.textContent='รหัสผ่านใหม่ไม่ตรงกัน'; return; }
   appPassword = nw;
+  persistAppState();
   ['settOldPw','settNewPw','settConfirmPw'].forEach(id => document.getElementById(id).value='');
   msg.style.color='#16a34a';
   msg.textContent='เปลี่ยนรหัสผ่านสำเร็จ!';
@@ -1535,6 +1568,7 @@ function saveTask() {
   };
   if (editIndex !== null) tasks[editIndex] = task;
   else tasks.unshift(task);
+  persistAppState();
   closeModal();
   filteredTasks = [...tasks];
   renderTable(); updateStats(); updateCharts();
@@ -1548,6 +1582,7 @@ function editTask(idx) {
 function deleteTask(idx) {
   if (!confirm(`ยืนยันลบงาน "${tasks[idx].name}" ?`)) return;
   tasks.splice(idx, 1);
+  persistAppState();
   filteredTasks = [...tasks];
   filteredTasks2 = [...tasks];
   renderTable(); renderTable2(); updateStats(); updateCharts();
@@ -1576,6 +1611,7 @@ function exportData() {
 }
 
 // ── INIT ──
+loadAppState();
 filteredTasks = [...tasks];
 filteredTasks2 = [...tasks];
 renderTable();
