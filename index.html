@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tracking Management Dashboard — Sustainability</title>
+<title>Task Tracker — Sustainability</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -712,7 +712,7 @@
     <div class="brand-icon">
       <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34c.75-.23 1.47-.5 2.14-.77C7.6 19.28 9.14 18 12 18c4.75 0 7-3.5 7-7 0-1.5-.5-3-2-3z"/></svg>
     </div>
-    <div class="brand-name">Tracking Management Dashboard</div>
+    <div class="brand-name">Task Tracker</div>
     <div class="brand-sub">Sustainability Platform</div>
   </div>
   <nav class="nav-section">
@@ -754,7 +754,7 @@
 <!-- MAIN -->
 <main class="main">
   <header class="topbar">
-    <div class="page-title">Tracking Management Dashboard</div>
+    <div class="page-title">Tracking Management</div>
     <div class="topbar-actions">
       <button class="btn btn-ghost" onclick="exportData()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16L7 11l1.4-1.45 2.6 2.6V4h2v8.15l2.6-2.6L17 11l-5 5zm-6 4q-.825 0-1.413-.588T4 18v-3h2v3h12v-3h2v3q0 .825-.588 1.413T18 20H6z"/></svg>
@@ -902,6 +902,7 @@
               <th>รายละเอียด</th>
               <th>สร้างโดย</th>
               <th>ผู้รับผิดชอบ</th>
+              <th>วันครบกำหนด</th>
               <th>สถานะ</th>
               <th>แก้ไขล่าสุด</th>
               <th></th>
@@ -949,6 +950,7 @@
                 <th>รายละเอียด</th>
                 <th>สร้างโดย</th>
                 <th>ผู้รับผิดชอบ</th>
+                <th>วันครบกำหนด</th>
                 <th>สถานะ</th>
                 <th>แก้ไขล่าสุด</th>
                 <th></th>
@@ -1096,6 +1098,10 @@
             <option value="เสร็จเรียบร้อย">เสร็จเรียบร้อย</option>
           </select>
         </div>
+        <div class="form-group">
+          <label class="form-label">วันครบกำหนด</label>
+          <input class="form-input" id="fDueDate" type="date">
+        </div>
         <div class="form-group form-full">
           <label class="form-label">รายละเอียดงาน</label>
           <textarea class="form-textarea" id="fDesc" placeholder="อธิบายรายละเอียดของงาน..."></textarea>
@@ -1157,13 +1163,13 @@ function initials(name) {
 }
 
 let tasks = [
-  {id:'d5ea4880', created:'2024-11-09', name:'งานจัดคอนเสิร์ต', desc:'จัดงานขอบคุณลูกค้า ให้กับบริษัท - โดยให้จัดสิ้นปีให้ลูกค้าสั่งการ - มี booth food truck - มีแสงสีเสียงครบชุด', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'กำลังดำเนินการ', updated:'2024-11-09'},
-  {id:'8e46bb5d', created:'2024-11-09', name:'ทดสอบ', desc:'ทดสอบ - เสร็จเรียบร้อยแล้ว ทดสอบนี้มีเรียนรู้ทำไปบ้างแล้ว อยากให้', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'เสร็จเรียบร้อย', updated:'2024-11-10'},
-  {id:'84078635', created:'2024-11-09', name:'ทดสอบ2', desc:'ทดสอบ2', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', status:'ยังไม่เริ่ม', updated:'2024-11-09'},
-  {id:'23af98d6', created:'2024-11-10', name:'งานจัดนิทรรศการ', desc:'งานจัดนิทรรศการ รายละเอียด', creator:'แดง-นรินทร์', creatorEmail:'red@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
-  {id:'402d75ff', created:'2024-11-06', name:'สไลด์ present งานสินค้า', desc:'สไลด์ present งานสินค้า', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', status:'กำลังดำเนินการ', updated:'2024-11-10'},
-  {id:'96ef5b76', created:'2024-11-10', name:'งานใหม่', desc:'งานใหม่', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
-  {id:'45b77924', created:'2024-11-10', name:'ทดสอบ23', desc:'ทดสอบ23', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'ยังไม่เริ่ม', updated:'2024-11-10'}
+  {id:'d5ea4880', created:'2024-11-09', name:'งานจัดคอนเสิร์ต', desc:'จัดงานขอบคุณลูกค้า ให้กับบริษัท - โดยให้จัดสิ้นปีให้ลูกค้าสั่งการ - มี booth food truck - มีแสงสีเสียงครบชุด', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-20', status:'กำลังดำเนินการ', updated:'2024-11-09'},
+  {id:'8e46bb5d', created:'2024-11-09', name:'ทดสอบ', desc:'ทดสอบ - เสร็จเรียบร้อยแล้ว ทดสอบนี้มีเรียนรู้ทำไปบ้างแล้ว อยากให้', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-15', status:'เสร็จเรียบร้อย', updated:'2024-11-10'},
+  {id:'84078635', created:'2024-11-09', name:'ทดสอบ2', desc:'ทดสอบ2', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', dueDate:'2024-11-18', status:'ยังไม่เริ่ม', updated:'2024-11-09'},
+  {id:'23af98d6', created:'2024-11-10', name:'งานจัดนิทรรศการ', desc:'งานจัดนิทรรศการ รายละเอียด', creator:'แดง-นรินทร์', creatorEmail:'red@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-25', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
+  {id:'402d75ff', created:'2024-11-06', name:'สไลด์ present งานสินค้า', desc:'สไลด์ present งานสินค้า', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', dueDate:'2024-11-22', status:'กำลังดำเนินการ', updated:'2024-11-10'},
+  {id:'96ef5b76', created:'2024-11-10', name:'งานใหม่', desc:'งานใหม่', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-28', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
+  {id:'45b77924', created:'2024-11-10', name:'ทดสอบ23', desc:'ทดสอบ23', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', dueDate:'2024-11-30', status:'ยังไม่เริ่ม', updated:'2024-11-10'}
 ];
 
 let editIndex = null;
@@ -1205,7 +1211,7 @@ function loadAppState() {
 // ── VIEW SWITCHING ──
 const views = ['dashboard','tasks','assignees','reports','settings'];
 const viewTitles = {
-  dashboard: 'Tracking Management Dashboard',
+  dashboard: 'Tracking Management',
   tasks: 'งานทั้งหมด',
   assignees: 'ผู้รับผิดชอบ',
   reports: 'รายงานสรุป',
@@ -1332,6 +1338,7 @@ function renderTable() {
       <td><div class="task-desc">${t.desc}</div></td>
       <td>${personCell(t.creator, t.creatorEmail)}</td>
       <td>${personCell(t.assignee, t.assigneeEmail)}</td>
+      <td><div class="date-cell">${fmtDate(t.dueDate)}</div></td>
       <td>${statusBadge(t.status)}</td>
       <td><div class="date-cell">${fmtDate(t.updated)}</div></td>
       <td>
@@ -1339,7 +1346,7 @@ function renderTable() {
           <button class="action-btn" title="แก้ไข" onclick="editTask(${tasks.indexOf(t)})">
             <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
           </button>
-          <button class="action-btn" title="ลบ" onclick="deleteTask(${tasks.indexOf(t)})" style="color:#e24b4a;">
+          <button class="action-btn" title="ลบ" onclick="requestDeleteTask(${tasks.indexOf(t)})" style="color:#e24b4a;">
             <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
           </button>
         </div>
@@ -1376,6 +1383,7 @@ function renderTable2() {
       <td><div class="task-desc">${t.desc}</div></td>
       <td>${personCell(t.creator, t.creatorEmail)}</td>
       <td>${personCell(t.assignee, t.assigneeEmail)}</td>
+      <td><div class="date-cell">${fmtDate(t.dueDate)}</div></td>
       <td>${statusBadge(t.status)}</td>
       <td><div class="date-cell">${fmtDate(t.updated)}</div></td>
       <td>
@@ -1383,7 +1391,7 @@ function renderTable2() {
           <button class="action-btn" title="แก้ไข" onclick="editTask(${tasks.indexOf(t)})">
             <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
           </button>
-          <button class="action-btn" title="ลบ" onclick="deleteTask(${tasks.indexOf(t)})" style="color:#e24b4a;">
+          <button class="action-btn" title="ลบ" onclick="requestDeleteTask(${tasks.indexOf(t)})" style="color:#e24b4a;">
             <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
           </button>
         </div>
@@ -1440,6 +1448,55 @@ function renderAssignees() {
 }
 
 // ── REPORTS VIEW ──
+
+const valueLabelPlugin = {
+  id: 'valueLabelPlugin',
+  afterDatasetsDraw(chart) {
+    const { ctx } = chart;
+    ctx.save();
+    const dataset = chart.data.datasets[0];
+    const meta = chart.getDatasetMeta(0);
+    const data = dataset?.data || [];
+
+    meta.data.forEach((element, index) => {
+      const value = data[index];
+      if (value === null || value === undefined || Number(value) === 0) return;
+
+      ctx.font = '600 12px Sarabun';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      if (chart.config.type === 'bar') {
+        const x = element.x;
+        const base = element.base;
+        const top = element.y;
+        const height = Math.abs(base - top);
+        let y = top + height / 2;
+
+        if (height < 22) {
+          y = top + 12;
+        }
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(String(value), x, y);
+      } else if (chart.config.type === 'doughnut') {
+        const props = element.getProps(['x', 'y', 'startAngle', 'endAngle', 'innerRadius', 'outerRadius'], true);
+        const angle = (props.startAngle + props.endAngle) / 2;
+        const radius = props.innerRadius + (props.outerRadius - props.innerRadius) * 0.62;
+        const x = props.x + Math.cos(angle) * radius;
+        const y = props.y + Math.sin(angle) * radius;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(String(value), x, y);
+      }
+    });
+
+    ctx.restore();
+  }
+};
+
+Chart.register(valueLabelPlugin);
+
+// ── REPORTS VIEW ──
 let donutChart2, barChart2;
 
 function renderReports() {
@@ -1462,13 +1519,13 @@ function renderReports() {
   donutChart2 = new Chart(document.getElementById('donutChart2').getContext('2d'), {
     type:'doughnut',
     data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderWidth:0,hoverOffset:6}]},
-    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false}}}
+    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} งาน`}}}}
   });
 
   barChart2 = new Chart(document.getElementById('barChart2').getContext('2d'), {
     type:'bar',
     data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{label:'จำนวนงาน',data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderRadius:8,borderSkipped:false,maxBarThickness:55}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Sarabun',size:11}},grid:{color:'rgba(61,122,85,0.07)'},border:{display:false}},x:{ticks:{font:{family:'Sarabun',size:11}},grid:{display:false},border:{display:false}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} งาน`}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Sarabun',size:11}},grid:{color:'rgba(61,122,85,0.07)'},border:{display:false}},x:{ticks:{font:{family:'Sarabun',size:11}},grid:{display:false},border:{display:false}}}}
   });
 }
 
@@ -1539,9 +1596,10 @@ function openModal(idx = null) {
     document.getElementById('fCreatorEmail').value = t.creatorEmail;
     document.getElementById('fAssignee').value = t.assignee;
     document.getElementById('fAssigneeEmail').value = t.assigneeEmail;
+    document.getElementById('fDueDate').value = t.dueDate || '';
   } else {
     document.getElementById('modalTitleText').textContent = 'เพิ่มงานใหม่';
-    ['fName','fDesc','fCreator','fCreatorEmail','fAssignee','fAssigneeEmail'].forEach(id => document.getElementById(id).value = '');
+    ['fName','fDesc','fCreator','fCreatorEmail','fAssignee','fAssigneeEmail','fDueDate'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('fStatus').value = 'ยังไม่เริ่ม';
   }
   overlay.classList.add('open');
@@ -1563,6 +1621,7 @@ function saveTask() {
     creatorEmail: document.getElementById('fCreatorEmail').value.trim(),
     assignee: document.getElementById('fAssignee').value.trim() || 'ไม่ระบุ',
     assigneeEmail: document.getElementById('fAssigneeEmail').value.trim(),
+    dueDate: document.getElementById('fDueDate').value || '',
     status: document.getElementById('fStatus').value,
     updated: today
   };
@@ -1577,6 +1636,10 @@ function saveTask() {
 
 function editTask(idx) {
   openWithPassword(() => openModal(idx));
+}
+
+function requestDeleteTask(idx) {
+  openWithPassword(() => deleteTask(idx));
 }
 
 function deleteTask(idx) {
@@ -1599,8 +1662,8 @@ function showToast(msg) {
 
 // ── EXPORT ──
 function exportData() {
-  const cols = ['created','id','name','desc','creator','creatorEmail','assignee','assigneeEmail','status','updated'];
-  const headers = ['วันที่สร้าง','ID งาน','ชื่องาน','รายละเอียด','สร้างโดย','อีเมลผู้สร้าง','ผู้รับผิดชอบ','อีเมลผู้รับผิดชอบ','สถานะ','แก้ไขล่าสุด'];
+  const cols = ['created','id','name','desc','creator','creatorEmail','assignee','assigneeEmail','dueDate','status','updated'];
+  const headers = ['วันที่สร้าง','ID งาน','ชื่องาน','รายละเอียด','สร้างโดย','อีเมลผู้สร้าง','ผู้รับผิดชอบ','อีเมลผู้รับผิดชอบ','วันครบกำหนด','สถานะ','แก้ไขล่าสุด'];
   const rows = [headers, ...filteredTasks.map(t => cols.map(c => `"${(t[c]||'').replace(/"/g,'""')}"` ))];
   const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
   const a = document.createElement('a');
