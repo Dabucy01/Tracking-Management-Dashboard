@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Tracker — Sustainability</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --forest: #1a3a2a;
+    --forest-mid: #2d5a3f;
+    --forest-light: #3d7a55;
+    --sage: #6fa882;
+    --leaf: #a8d5b5;
+    --mist: #e8f5ed;
+    --cream: #fafdf8;
+    --amber: #c8893a;
+    --amber-light: #f5d99a;
+    --earth: #8b6a45;
+    --text-dark: #1a2d22;
+    --text-mid: #3d5c48;
+    --text-soft: #6a8f78;
+    --border: rgba(61,122,85,0.15);
+    --card-shadow: 0 2px 20px rgba(26,58,42,0.08);
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background: var(--forest);
+    position: fixed;
+    top: 0; left: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 2rem;
+    z-index: 100;
+    overflow: hidden;
+  }
+
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -40px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(109,168,130,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: 40px; left: -50px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(168,213,181,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .brand {
+    padding: 1.8rem 1.5rem 1.4rem;
+    border-bottom: 1px solid rgba(168,213,181,0.12);
+    position: relative;
+  }
+
+  .brand-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--sage), var(--forest-light));
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 0.8rem;
+  }
+
+  .brand-icon svg { width: 20px; height: 20px; fill: white; }
+
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--leaf);
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+  }
+
+  .brand-sub {
+    font-size: 0.7rem;
+    color: rgba(168,213,181,0.5);
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-top: 2px;
+  }
+
+  .nav-section {
+    padding: 1.2rem 1rem 0;
+    flex: 1;
+  }
+
+  .nav-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(168,213,181,0.4);
+    padding: 0 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.65rem 0.9rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: rgba(168,213,181,0.6);
+    font-size: 0.85rem;
+    font-weight: 400;
+    margin-bottom: 2px;
+    text-decoration: none;
+  }
+
+  .nav-item:hover { background: rgba(168,213,181,0.08); color: var(--leaf); }
+  .nav-item.active { background: rgba(168,213,181,0.15); color: white; font-weight: 500; }
+  .nav-item.active .nav-dot { background: var(--sage); }
+
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(168,213,181,0.3);
+    flex-shrink: 0;
+  }
+
+  .nav-icon { width: 16px; height: 16px; opacity: 0.8; }
+
+  .sidebar-footer {
+    padding: 1rem 1.5rem 0;
+    border-top: 1px solid rgba(168,213,181,0.08);
+  }
+
+  .user-pill {
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--sage), var(--forest-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .user-info .user-name { font-size: 0.78rem; color: var(--leaf); font-weight: 500; }
+  .user-info .user-role { font-size: 0.65rem; color: rgba(168,213,181,0.45); }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: 240px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0.9rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0;
+    z-index: 50;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--forest);
+  }
+
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+  .btn {
+    padding: 0.5rem 1.1rem;
+    border-radius: var(--radius-sm);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .btn-primary {
+    background: var(--forest-mid);
+    color: white;
+  }
+  .btn-primary:hover { background: var(--forest); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26,58,42,0.25); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-mid);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--mist); }
+
+  .content { padding: 1.8rem 2rem 3rem; }
+
+  /* ── FILTERS ── */
+  .filter-bar {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+  }
+
+  .filter-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+
+  .filter-group { display: flex; align-items: center; gap: 0.6rem; }
+  .filter-group label { font-size: 0.8rem; color: var(--text-mid); white-space: nowrap; }
+
+  input[type="date"], select.filter-select {
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.82rem;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-dark);
+    background: var(--mist);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  input[type="date"]:focus, select.filter-select:focus { border-color: var(--sage); }
+
+  .filter-sep { width: 1px; height: 28px; background: var(--border); }
+
+  /* ── STAT CARDS ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.4rem;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(26,58,42,0.12); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    border-radius: 0 var(--radius) 0 100%;
+    opacity: 0.08;
+  }
+
+  .stat-card.total::before { background: var(--forest); }
+  .stat-card.pending::before { background: #e8a020; }
+  .stat-card.in-progress::before { background: #3b82f6; }
+  .stat-card.done::before { background: #22c55e; }
+
+  .stat-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 0.9rem;
+  }
+
+  .stat-icon svg { width: 18px; height: 18px; }
+  .total .stat-icon { background: rgba(45,90,63,0.1); }
+  .total .stat-icon svg { fill: var(--forest-mid); }
+  .pending .stat-icon { background: rgba(232,160,32,0.12); }
+  .pending .stat-icon svg { fill: #c8893a; }
+  .in-progress .stat-icon { background: rgba(59,130,246,0.1); }
+  .in-progress .stat-icon svg { fill: #3b82f6; }
+  .done .stat-icon { background: rgba(34,197,94,0.1); }
+  .done .stat-icon svg { fill: #16a34a; }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--text-soft);
+    font-weight: 400;
+  }
+
+  .stat-pct {
+    font-size: 0.7rem;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-top: 0.5rem;
+    display: inline-block;
+  }
+
+  .pending .stat-pct { background: rgba(232,160,32,0.12); color: #a06a10; }
+  .in-progress .stat-pct { background: rgba(59,130,246,0.1); color: #1d4ed8; }
+  .done .stat-pct { background: rgba(34,197,94,0.1); color: #166534; }
+  .total .stat-pct { background: var(--mist); color: var(--forest-mid); }
+
+  /* ── CHARTS ROW ── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .chart-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.6rem;
+    box-shadow: var(--card-shadow);
+  }
+
+  .chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+
+  .chart-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-dark);
+  }
+
+  .chart-subtitle { font-size: 0.72rem; color: var(--text-soft); margin-top: 2px; }
+
+  .chart-wrap { position: relative; }
+  .donut-wrap { height: 200px; display: flex; align-items: center; justify-content: center; }
+  .bar-wrap { height: 200px; }
+
+  .legend { display: flex; flex-direction: column; gap: 8px; margin-top: 1rem; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: var(--text-mid); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  /* ── TABLE ── */
+  .table-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.6rem;
+    border-bottom: 1px solid var(--border);
+    background: white;
+  }
+
+  .table-title-group { }
+  .table-title { font-size: 0.9rem; font-weight: 600; color: var(--text-dark); }
+  .table-count { font-size: 0.72rem; color: var(--text-soft); margin-top: 2px; }
+
+  .table-actions { display: flex; gap: 8px; align-items: center; }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.42rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--mist);
+  }
+
+  .search-box input {
+    border: none;
+    background: transparent;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-dark);
+    outline: none;
+    width: 160px;
+  }
+
+  .search-box svg { width: 14px; height: 14px; fill: var(--text-soft); flex-shrink: 0; }
+
+  .table-wrap { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+
+  thead tr {
+    background: var(--mist);
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    padding: 0.7rem 1rem;
+    text-align: left;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid rgba(61,122,85,0.06);
+    transition: background 0.15s;
+  }
+  tbody tr:hover { background: rgba(232,245,237,0.5); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td {
+    padding: 0.85rem 1rem;
+    color: var(--text-dark);
+    vertical-align: top;
+  }
+
+  .task-id {
+    font-family: monospace;
+    font-size: 0.72rem;
+    background: var(--mist);
+    color: var(--text-soft);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .task-name {
+    font-weight: 500;
+    color: var(--forest);
+    max-width: 120px;
+  }
+
+  .task-desc {
+    color: var(--text-soft);
+    font-size: 0.75rem;
+    max-width: 160px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .person-cell { display: flex; align-items: center; gap: 6px; }
+  .mini-avatar {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .person-name { font-size: 0.78rem; color: var(--text-dark); }
+  .person-email { font-size: 0.68rem; color: var(--text-soft); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+  .badge-pending {
+    background: rgba(232,160,32,0.12);
+    color: #92600a;
+  }
+  .badge-pending .badge-dot { background: #c8893a; }
+
+  .badge-progress {
+    background: rgba(59,130,246,0.1);
+    color: #1e40af;
+  }
+  .badge-progress .badge-dot { background: #3b82f6; }
+
+  .badge-done {
+    background: rgba(34,197,94,0.1);
+    color: #15803d;
+  }
+  .badge-done .badge-dot { background: #22c55e; }
+
+  .date-cell { font-size: 0.75rem; color: var(--text-soft); white-space: nowrap; }
+
+  .action-btn {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    color: var(--text-soft);
+  }
+  .action-btn:hover { background: var(--mist); color: var(--forest); border-color: var(--sage); }
+  .action-btn svg { width: 12px; height: 12px; fill: currentColor; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,25,15,0.55);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: white;
+    border-radius: 18px;
+    width: 540px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(10,25,15,0.3);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.25s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+  .modal-head {
+    padding: 1.4rem 1.6rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--forest);
+  }
+
+  .modal-close {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    color: var(--text-soft);
+    transition: all 0.15s;
+  }
+  .modal-close:hover { background: var(--mist); color: var(--forest); }
+
+  .modal-body { padding: 1.4rem 1.6rem; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-full { grid-column: 1 / -1; }
+
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-label { font-size: 0.75rem; font-weight: 600; color: var(--text-mid); }
+
+  .form-input, .form-select, .form-textarea {
+    font-family: 'Sarabun', sans-serif;
+    font-size: 0.83rem;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--mist);
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--sage);
+    background: white;
+  }
+  .form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+  .modal-foot {
+    padding: 1rem 1.6rem 1.4rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: var(--forest);
+    color: white;
+    padding: 0.75rem 1.2rem;
+    border-radius: 12px;
+    font-size: 0.83rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 8px 32px rgba(10,25,15,0.35);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 2000;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast svg { width: 16px; height: 16px; fill: var(--leaf); flex-shrink: 0; }
+
+  /* ── EMPTY ── */
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-soft);
+    font-size: 0.85rem;
+  }
+  .empty-state .empty-icon { font-size: 2.5rem; margin-bottom: 0.7rem; opacity: 0.5; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--leaf); border-radius: 10px; }
+
+  /* ── LEAF DECORATION ── */
+  .leaf-deco {
+    position: absolute;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+
+  .status-indicator {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.72rem;
+    color: var(--text-soft);
+  }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  .progress-ring {
+    position: absolute;
+    bottom: 1rem; right: 1rem;
+    width: 42px; height: 42px;
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34c.75-.23 1.47-.5 2.14-.77C7.6 19.28 9.14 18 12 18c4.75 0 7-3.5 7-7 0-1.5-.5-3-2-3z"/></svg>
+    </div>
+    <div class="brand-name">Task Tracker</div>
+    <div class="brand-sub">Sustainability Platform</div>
+  </div>
+  <nav class="nav-section">
+    <div class="nav-label">เมนูหลัก</div>
+    <a class="nav-item active" href="javascript:void(0)" onclick="switchView('dashboard')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+      <div class="nav-dot" style="margin-left:auto;"></div>
+    </a>
+    <a class="nav-item" href="javascript:void(0)" onclick="switchView('tasks')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      งานทั้งหมด
+    </a>
+    <a class="nav-item" href="javascript:void(0)" onclick="switchView('assignees')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0113 0"/></svg>
+      ผู้รับผิดชอบ
+    </a>
+    <a class="nav-item" href="javascript:void(0)" onclick="switchView('reports')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      รายงาน
+    </a>
+    <div class="nav-label" style="margin-top:1.2rem;">ระบบ</div>
+    <a class="nav-item" href="javascript:void(0)" onclick="switchView('settings')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>
+      ตั้งค่า
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="avatar">CS</div>
+      <div class="user-info">
+        <div class="user-name">Crown Seal</div>
+        <div class="user-role">Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div class="page-title">Task Management Dashboard</div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="exportData()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 16L7 11l1.4-1.45 2.6 2.6V4h2v8.15l2.6-2.6L17 11l-5 5zm-6 4q-.825 0-1.413-.588T4 18v-3h2v3h12v-3h2v3q0 .825-.588 1.413T18 20H6z"/></svg>
+        ส่งออก CSV
+      </button>
+      <button class="btn btn-primary" onclick="openWithPassword(()=>openModal())">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+        เพิ่มงานใหม่
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- ── VIEW: DASHBOARD (default) ── -->
+    <div id="view-dashboard">
+
+    <!-- FILTER BAR -->
+    <div class="filter-bar">
+      <span class="filter-label">กรองข้อมูล</span>
+      <div class="filter-group">
+        <label>จาก</label>
+        <input type="date" id="dateFrom" value="2024-11-01">
+      </div>
+      <div class="filter-group">
+        <label>ถึง</label>
+        <input type="date" id="dateTo" value="2024-11-30">
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <label>สถานะ</label>
+        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+          <option value="">ทั้งหมด</option>
+          <option value="ยังไม่เริ่ม">ยังไม่เริ่ม</option>
+          <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+          <option value="เสร็จเรียบร้อย">เสร็จเรียบร้อย</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>ผู้รับผิดชอบ</label>
+        <select class="filter-select" id="assigneeFilter" onchange="applyFilters()">
+          <option value="">ทั้งหมด</option>
+          <option value="แดง-นรินทร์">แดง-นรินทร์</option>
+          <option value="น้อย-น้องนิด">น้อย-น้องนิด</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost" style="margin-left:auto;" onclick="resetFilters()">รีเซ็ต</button>
+      <button class="btn btn-primary" onclick="applyFilters()">ค้นหา</button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card total">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        </div>
+        <div class="stat-value" id="statTotal">7</div>
+        <div class="stat-label">Task รวมทั้งหมด</div>
+        <div class="stat-pct" id="statTotalLabel">งานทั้งหมด</div>
+      </div>
+      <div class="stat-card pending">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="stat-value" id="statPending">4</div>
+        <div class="stat-label">ยังไม่เริ่ม</div>
+        <div class="stat-pct" id="statPendingPct">57.1%</div>
+      </div>
+      <div class="stat-card in-progress">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.5 7.54L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.5 2.47C6.81 18 5 15.21 5 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg>
+        </div>
+        <div class="stat-value" id="statProgress">2</div>
+        <div class="stat-label">กำลังดำเนินการ</div>
+        <div class="stat-pct" id="statProgressPct">28.6%</div>
+      </div>
+      <div class="stat-card done">
+        <div class="stat-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <div class="stat-value" id="statDone">1</div>
+        <div class="stat-label">เสร็จเรียบร้อย</div>
+        <div class="stat-pct" id="statDonePct">14.3%</div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">สัดส่วนสถานะงาน</div>
+            <div class="chart-subtitle">Donut Chart</div>
+          </div>
+        </div>
+        <div class="donut-wrap">
+          <canvas id="donutChart"></canvas>
+        </div>
+        <div class="legend" id="donutLegend">
+          <div class="legend-item"><div class="legend-dot" style="background:#c8893a;"></div><span>ยังไม่เริ่ม</span><span style="margin-left:auto;font-weight:600;" id="legPending">4 (57.1%)</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div><span>กำลังดำเนินการ</span><span style="margin-left:auto;font-weight:600;" id="legProgress">2 (28.6%)</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div><span>เสร็จเรียบร้อย</span><span style="margin-left:auto;font-weight:600;" id="legDone">1 (14.3%)</span></div>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">สรุปงานตามสถานะ</div>
+            <div class="chart-subtitle">Bar Chart</div>
+          </div>
+          <div class="status-indicator">
+            <div class="status-dot" style="background:#22c55e;"></div>
+            อัปเดตล่าสุด: พ.ย. 2567
+          </div>
+        </div>
+        <div class="bar-wrap">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title-group">
+          <div class="table-title">รายการงานทั้งหมด</div>
+          <div class="table-count" id="tableCount">แสดง 7 รายการ</div>
+        </div>
+        <div class="table-actions">
+          <div class="search-box">
+            <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+            <input type="text" placeholder="ค้นหางาน..." id="searchInput" oninput="applyFilters()">
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="taskTable">
+          <thead>
+            <tr>
+              <th>วันที่สร้าง</th>
+              <th>ID งาน</th>
+              <th>ชื่องาน</th>
+              <th>รายละเอียด</th>
+              <th>สร้างโดย</th>
+              <th>ผู้รับผิดชอบ</th>
+              <th>สถานะ</th>
+              <th>แก้ไขล่าสุด</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="taskBody"></tbody>
+        </table>
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <div class="empty-icon">🌿</div>
+          ไม่พบรายการที่ตรงกับเงื่อนไข
+        </div>
+      </div>
+    </div>
+
+    </div><!-- end view-dashboard -->
+
+    <!-- ── VIEW: TASKS ── -->
+    <div id="view-tasks" style="display:none;">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title-group">
+            <div class="table-title">งานทั้งหมด</div>
+            <div class="table-count" id="tableCount2">แสดง 7 รายการ</div>
+          </div>
+          <div class="table-actions">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+              <input type="text" placeholder="ค้นหางาน..." id="searchInput2" oninput="applyFilters2()">
+            </div>
+            <select class="filter-select" id="statusFilter2" onchange="applyFilters2()">
+              <option value="">สถานะทั้งหมด</option>
+              <option value="ยังไม่เริ่ม">ยังไม่เริ่ม</option>
+              <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+              <option value="เสร็จเรียบร้อย">เสร็จเรียบร้อย</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>วันที่สร้าง</th>
+                <th>ID งาน</th>
+                <th>ชื่องาน</th>
+                <th>รายละเอียด</th>
+                <th>สร้างโดย</th>
+                <th>ผู้รับผิดชอบ</th>
+                <th>สถานะ</th>
+                <th>แก้ไขล่าสุด</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="taskBody2"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState2" style="display:none;">
+            <div class="empty-icon">🌿</div>ไม่พบรายการ
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: ASSIGNEES ── -->
+    <div id="view-assignees" style="display:none;">
+      <div id="assigneeCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;"></div>
+    </div>
+
+    <!-- ── VIEW: REPORTS ── -->
+    <div id="view-reports" style="display:none;">
+      <div class="stats-row" style="margin-bottom:1.5rem;">
+        <div class="stat-card total"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div><div class="stat-value" id="rTotal">7</div><div class="stat-label">Task รวม</div></div>
+        <div class="stat-card pending"><div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><div class="stat-value" id="rPending">4</div><div class="stat-label">ยังไม่เริ่ม</div></div>
+        <div class="stat-card in-progress"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.5 7.54L13 17v5h5l-1.22-1.22C19.91 19.07 22 15.76 22 12c0-5.18-3.95-9.45-9-9.95zM11 2.05C5.95 2.55 2 6.82 2 12c0 3.76 2.09 7.07 5.22 8.78L6 22h5v-5l-2.5 2.47C6.81 18 5 15.21 5 12c0-4.08 3.05-7.44 7-7.93V2.05z"/></svg></div><div class="stat-value" id="rProgress">2</div><div class="stat-label">กำลังดำเนินการ</div></div>
+        <div class="stat-card done"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><div class="stat-value" id="rDone">1</div><div class="stat-label">เสร็จเรียบร้อย</div></div>
+      </div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">สัดส่วนสถานะงาน</div><div class="chart-subtitle">Donut Chart</div></div></div>
+          <div class="donut-wrap"><canvas id="donutChart2"></canvas></div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#c8893a;"></div><span>ยังไม่เริ่ม</span><span style="margin-left:auto;font-weight:600;" id="rLegPending">-</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div><span>กำลังดำเนินการ</span><span style="margin-left:auto;font-weight:600;" id="rLegProgress">-</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div><span>เสร็จเรียบร้อย</span><span style="margin-left:auto;font-weight:600;" id="rLegDone">-</span></div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">สรุปงานตามสถานะ</div><div class="chart-subtitle">Bar Chart</div></div></div>
+          <div class="bar-wrap"><canvas id="barChart2"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VIEW: SETTINGS ── -->
+    <div id="view-settings" style="display:none;">
+      <div style="max-width:480px;">
+        <div class="chart-card" style="margin-bottom:1rem;">
+          <div class="chart-header" style="margin-bottom:0.8rem;">
+            <div>
+              <div class="chart-title">ข้อมูลองค์กร</div>
+              <div class="chart-subtitle">Crown Seal Public Co. Ltd.</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.8rem;">
+            <div class="form-group">
+              <label class="form-label">ชื่อองค์กร</label>
+              <input class="form-input" value="Crown Seal Public Co. Ltd." readonly style="background:#f0f7f0;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">บทบาท</label>
+              <input class="form-input" value="Admin" readonly style="background:#f0f7f0;">
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header" style="margin-bottom:0.8rem;">
+            <div>
+              <div class="chart-title">เปลี่ยนรหัสผ่าน</div>
+              <div class="chart-subtitle">รหัสผ่านสำหรับเพิ่ม/แก้ไขงาน</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.8rem;">
+            <div class="form-group">
+              <label class="form-label">รหัสผ่านปัจจุบัน</label>
+              <input class="form-input" type="password" id="settOldPw" placeholder="••••••">
+            </div>
+            <div class="form-group">
+              <label class="form-label">รหัสผ่านใหม่</label>
+              <input class="form-input" type="password" id="settNewPw" placeholder="••••••">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ยืนยันรหัสผ่านใหม่</label>
+              <input class="form-input" type="password" id="settConfirmPw" placeholder="••••••">
+            </div>
+            <div id="settMsg" style="font-size:0.78rem;min-height:18px;"></div>
+            <button class="btn btn-primary" style="align-self:flex-start;" onclick="changePassword()">บันทึกรหัสผ่านใหม่</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
+</main>
+
+<!-- PASSWORD MODAL -->
+<div class="modal-overlay" id="pwOverlay" onclick="closePwOutside(event)">
+  <div class="modal" style="width:360px;">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;background:linear-gradient(135deg,#2d5a3f,#6fa882);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        </div>
+        <div class="modal-title">ยืนยันตัวตน</div>
+      </div>
+      <button class="modal-close" onclick="closePwModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.82rem;color:var(--text-soft);margin-bottom:1rem;">กรุณาใส่รหัสผ่านเพื่อดำเนินการต่อ</p>
+      <div class="form-group">
+        <label class="form-label">รหัสผ่าน</label>
+        <input class="form-input" type="password" id="pwInput" placeholder="••••••" onkeydown="if(event.key==='Enter')verifyPassword()">
+      </div>
+      <div id="pwError" style="font-size:0.75rem;color:#e24b4a;margin-top:6px;min-height:18px;"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closePwModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="verifyPassword()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        ยืนยัน
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitleText">เพิ่มงานใหม่</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">ชื่องาน *</label>
+          <input class="form-input" id="fName" placeholder="ระบุชื่องาน">
+        </div>
+        <div class="form-group">
+          <label class="form-label">สถานะ *</label>
+          <select class="form-select" id="fStatus">
+            <option value="ยังไม่เริ่ม">ยังไม่เริ่ม</option>
+            <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+            <option value="เสร็จเรียบร้อย">เสร็จเรียบร้อย</option>
+          </select>
+        </div>
+        <div class="form-group form-full">
+          <label class="form-label">รายละเอียดงาน</label>
+          <textarea class="form-textarea" id="fDesc" placeholder="อธิบายรายละเอียดของงาน..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">สร้างโดย</label>
+          <input class="form-input" id="fCreator" placeholder="ชื่อผู้สร้าง">
+        </div>
+        <div class="form-group">
+          <label class="form-label">อีเมลผู้สร้าง</label>
+          <input class="form-input" id="fCreatorEmail" type="email" placeholder="email@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">ผู้รับผิดชอบ</label>
+          <input class="form-input" id="fAssignee" placeholder="ชื่อผู้รับผิดชอบ">
+        </div>
+        <div class="form-group">
+          <label class="form-label">อีเมลผู้รับผิดชอบ</label>
+          <input class="form-input" id="fAssigneeEmail" type="email" placeholder="email@example.com">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-primary" onclick="saveTask()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        บันทึก
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+  <span id="toastMsg">บันทึกสำเร็จ</span>
+</div>
+
+<script>
+const COLORS = {
+  pending: '#c8893a',
+  progress: '#3b82f6',
+  done: '#22c55e'
+};
+
+const avatarColors = ['#2d5a3f','#3b82f6','#c8893a','#a855f7','#ec4899','#14b8a6'];
+const avatarCache = {};
+function getAvatar(name) {
+  if (!avatarCache[name]) {
+    const idx = Object.keys(avatarCache).length % avatarColors.length;
+    avatarCache[name] = avatarColors[idx];
+  }
+  return avatarCache[name];
+}
+
+function initials(name) {
+  const p = name.split('-');
+  return p.map(s => s[0] || '').join('').slice(0,2).toUpperCase() || name.slice(0,2).toUpperCase();
+}
+
+let tasks = [
+  {id:'d5ea4880', created:'2024-11-09', name:'งานจัดคอนเสิร์ต', desc:'จัดงานขอบคุณลูกค้า ให้กับบริษัท - โดยให้จัดสิ้นปีให้ลูกค้าสั่งการ - มี booth food truck - มีแสงสีเสียงครบชุด', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'กำลังดำเนินการ', updated:'2024-11-09'},
+  {id:'8e46bb5d', created:'2024-11-09', name:'ทดสอบ', desc:'ทดสอบ - เสร็จเรียบร้อยแล้ว ทดสอบนี้มีเรียนรู้ทำไปบ้างแล้ว อยากให้', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'เสร็จเรียบร้อย', updated:'2024-11-10'},
+  {id:'84078635', created:'2024-11-09', name:'ทดสอบ2', desc:'ทดสอบ2', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', status:'ยังไม่เริ่ม', updated:'2024-11-09'},
+  {id:'23af98d6', created:'2024-11-10', name:'งานจัดนิทรรศการ', desc:'งานจัดนิทรรศการ รายละเอียด', creator:'แดง-นรินทร์', creatorEmail:'red@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
+  {id:'402d75ff', created:'2024-11-06', name:'สไลด์ present งานสินค้า', desc:'สไลด์ present งานสินค้า', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'น้อย-น้องนิด', assigneeEmail:'noi@gmail.com', status:'กำลังดำเนินการ', updated:'2024-11-10'},
+  {id:'96ef5b76', created:'2024-11-10', name:'งานใหม่', desc:'งานใหม่', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'ยังไม่เริ่ม', updated:'2024-11-10'},
+  {id:'45b77924', created:'2024-11-10', name:'ทดสอบ23', desc:'ทดสอบ23', creator:'นนท์-นุนท์', creatorEmail:'nont@gmail.com', assignee:'แดง-นรินทร์', assigneeEmail:'red@gmail.com', status:'ยังไม่เริ่ม', updated:'2024-11-10'}
+];
+
+let editIndex = null;
+let pendingEditIndex = null;
+let appPassword = '1234';
+
+// ── VIEW SWITCHING ──
+const views = ['dashboard','tasks','assignees','reports','settings'];
+const viewTitles = {
+  dashboard: 'Task Management Dashboard',
+  tasks: 'งานทั้งหมด',
+  assignees: 'ผู้รับผิดชอบ',
+  reports: 'รายงานสรุป',
+  settings: 'ตั้งค่าระบบ'
+};
+
+function switchView(name) {
+  views.forEach(v => {
+    const el = document.getElementById('view-' + v);
+    if (el) el.style.display = v === name ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', el.getAttribute('onclick').includes("'" + name + "'"));
+  });
+  document.querySelector('.page-title').textContent = viewTitles[name] || '';
+  if (name === 'assignees') renderAssignees();
+  if (name === 'reports') renderReports();
+  if (name === 'tasks') { filteredTasks2 = [...tasks]; renderTable2(); }
+}
+
+// ── PASSWORD ──
+function openWithPassword(cb) {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  document.getElementById('pwOverlay').classList.add('open');
+  document.getElementById('pwInput').focus();
+  window._pwCallback = cb;
+}
+
+function verifyPassword() {
+  const val = document.getElementById('pwInput').value;
+  if (val === appPassword) {
+    closePwModal();
+    if (window._pwCallback) window._pwCallback();
+  } else {
+    document.getElementById('pwError').textContent = 'รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+function closePwModal() { document.getElementById('pwOverlay').classList.remove('open'); }
+function closePwOutside(e) { if (e.target === document.getElementById('pwOverlay')) closePwModal(); }
+
+function changePassword() {
+  const old = document.getElementById('settOldPw').value;
+  const nw = document.getElementById('settNewPw').value;
+  const cf = document.getElementById('settConfirmPw').value;
+  const msg = document.getElementById('settMsg');
+  if (old !== appPassword) { msg.style.color='#e24b4a'; msg.textContent='รหัสผ่านปัจจุบันไม่ถูกต้อง'; return; }
+  if (!nw) { msg.style.color='#e24b4a'; msg.textContent='กรุณาใส่รหัสผ่านใหม่'; return; }
+  if (nw !== cf) { msg.style.color='#e24b4a'; msg.textContent='รหัสผ่านใหม่ไม่ตรงกัน'; return; }
+  appPassword = nw;
+  ['settOldPw','settNewPw','settConfirmPw'].forEach(id => document.getElementById(id).value='');
+  msg.style.color='#16a34a';
+  msg.textContent='เปลี่ยนรหัสผ่านสำเร็จ!';
+  setTimeout(() => msg.textContent='', 3000);
+  showToast('เปลี่ยนรหัสผ่านสำเร็จ');
+}
+
+// ── UTILS ──
+function genId() { return Math.random().toString(16).slice(2,10); }
+
+function fmtDate(d) {
+  if (!d) return '-';
+  const [y,m,day] = d.split('-');
+  return `${parseInt(day)}/${parseInt(m)}/${y}`;
+}
+
+function statusBadge(s) {
+  if (s === 'ยังไม่เริ่ม') return `<span class="badge badge-pending"><span class="badge-dot"></span>${s}</span>`;
+  if (s === 'กำลังดำเนินการ') return `<span class="badge badge-progress"><span class="badge-dot"></span>${s}</span>`;
+  return `<span class="badge badge-done"><span class="badge-dot"></span>${s}</span>`;
+}
+
+function personCell(name, email) {
+  const color = getAvatar(name);
+  const ini = initials(name);
+  return `<div class="person-cell"><div class="mini-avatar" style="background:${color};">${ini}</div><div><div class="person-name">${name}</div><div class="person-email">${email}</div></div></div>`;
+}
+
+// ── DASHBOARD FILTERS ──
+let filteredTasks = [...tasks];
+
+function applyFilters() {
+  const statusF = document.getElementById('statusFilter').value;
+  const assigneeF = document.getElementById('assigneeFilter').value;
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const from = document.getElementById('dateFrom').value;
+  const to = document.getElementById('dateTo').value;
+  filteredTasks = tasks.filter(t => {
+    if (statusF && t.status !== statusF) return false;
+    if (assigneeF && t.assignee !== assigneeF) return false;
+    if (search && !t.name.toLowerCase().includes(search) && !t.desc.toLowerCase().includes(search) && !t.id.includes(search)) return false;
+    if (from && t.created < from) return false;
+    if (to && t.created > to) return false;
+    return true;
+  });
+  renderTable(); updateStats(); updateCharts();
+}
+
+function resetFilters() {
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('assigneeFilter').value = '';
+  document.getElementById('searchInput').value = '';
+  document.getElementById('dateFrom').value = '2024-11-01';
+  document.getElementById('dateTo').value = '2024-11-30';
+  filteredTasks = [...tasks];
+  renderTable(); updateStats(); updateCharts();
+}
+
+function renderTable() {
+  const body = document.getElementById('taskBody');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('tableCount').textContent = `แสดง ${filteredTasks.length} รายการ`;
+  if (filteredTasks.length === 0) { body.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  body.innerHTML = filteredTasks.map(t => `
+    <tr>
+      <td><div class="date-cell">${fmtDate(t.created)}</div></td>
+      <td><span class="task-id">${t.id.slice(0,8)}</span></td>
+      <td><div class="task-name">${t.name}</div></td>
+      <td><div class="task-desc">${t.desc}</div></td>
+      <td>${personCell(t.creator, t.creatorEmail)}</td>
+      <td>${personCell(t.assignee, t.assigneeEmail)}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td><div class="date-cell">${fmtDate(t.updated)}</div></td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="action-btn" title="แก้ไข" onclick="editTask(${tasks.indexOf(t)})">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </button>
+          <button class="action-btn" title="ลบ" onclick="deleteTask(${tasks.indexOf(t)})" style="color:#e24b4a;">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── TASKS VIEW ──
+let filteredTasks2 = [...tasks];
+
+function applyFilters2() {
+  const s = document.getElementById('statusFilter2').value;
+  const q = document.getElementById('searchInput2').value.toLowerCase();
+  filteredTasks2 = tasks.filter(t => {
+    if (s && t.status !== s) return false;
+    if (q && !t.name.toLowerCase().includes(q) && !t.id.includes(q)) return false;
+    return true;
+  });
+  renderTable2();
+}
+
+function renderTable2() {
+  const body = document.getElementById('taskBody2');
+  const empty = document.getElementById('emptyState2');
+  document.getElementById('tableCount2').textContent = `แสดง ${filteredTasks2.length} รายการ`;
+  if (filteredTasks2.length === 0) { body.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  body.innerHTML = filteredTasks2.map(t => `
+    <tr>
+      <td><div class="date-cell">${fmtDate(t.created)}</div></td>
+      <td><span class="task-id">${t.id.slice(0,8)}</span></td>
+      <td><div class="task-name">${t.name}</div></td>
+      <td><div class="task-desc">${t.desc}</div></td>
+      <td>${personCell(t.creator, t.creatorEmail)}</td>
+      <td>${personCell(t.assignee, t.assigneeEmail)}</td>
+      <td>${statusBadge(t.status)}</td>
+      <td><div class="date-cell">${fmtDate(t.updated)}</div></td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="action-btn" title="แก้ไข" onclick="editTask(${tasks.indexOf(t)})">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </button>
+          <button class="action-btn" title="ลบ" onclick="deleteTask(${tasks.indexOf(t)})" style="color:#e24b4a;">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ── ASSIGNEES VIEW ──
+function renderAssignees() {
+  const people = {};
+  tasks.forEach(t => {
+    if (!people[t.assignee]) people[t.assignee] = {name:t.assignee, email:t.assigneeEmail, total:0, pending:0, progress:0, done:0};
+    people[t.assignee].total++;
+    if (t.status==='ยังไม่เริ่ม') people[t.assignee].pending++;
+    if (t.status==='กำลังดำเนินการ') people[t.assignee].progress++;
+    if (t.status==='เสร็จเรียบร้อย') people[t.assignee].done++;
+  });
+  const container = document.getElementById('assigneeCards');
+  container.innerHTML = Object.values(people).map(p => {
+    const color = getAvatar(p.name);
+    const ini = initials(p.name);
+    const donePct = p.total ? Math.round(p.done/p.total*100) : 0;
+    return `
+      <div class="chart-card">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
+          <div style="width:44px;height:44px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:1rem;">${ini}</div>
+          <div>
+            <div style="font-weight:600;color:var(--text-dark);">${p.name}</div>
+            <div style="font-size:0.72rem;color:var(--text-soft);">${p.email}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem;">
+          <div style="text-align:center;background:rgba(232,160,32,0.08);border-radius:8px;padding:8px;">
+            <div style="font-size:1.3rem;font-weight:700;color:#c8893a;">${p.pending}</div>
+            <div style="font-size:0.65rem;color:var(--text-soft);">ยังไม่เริ่ม</div>
+          </div>
+          <div style="text-align:center;background:rgba(59,130,246,0.08);border-radius:8px;padding:8px;">
+            <div style="font-size:1.3rem;font-weight:700;color:#3b82f6;">${p.progress}</div>
+            <div style="font-size:0.65rem;color:var(--text-soft);">ดำเนินการ</div>
+          </div>
+          <div style="text-align:center;background:rgba(34,197,94,0.08);border-radius:8px;padding:8px;">
+            <div style="font-size:1.3rem;font-weight:700;color:#16a34a;">${p.done}</div>
+            <div style="font-size:0.65rem;color:var(--text-soft);">เสร็จแล้ว</div>
+          </div>
+        </div>
+        <div style="font-size:0.72rem;color:var(--text-soft);margin-bottom:4px;">ความคืบหน้า ${donePct}% (${p.done}/${p.total} งาน)</div>
+        <div style="height:6px;background:var(--mist);border-radius:10px;overflow:hidden;">
+          <div style="height:100%;width:${donePct}%;background:linear-gradient(90deg,#3d7a55,#22c55e);border-radius:10px;transition:width 0.6s;"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── REPORTS VIEW ──
+let donutChart2, barChart2;
+
+function renderReports() {
+  const total = tasks.length;
+  const pending = tasks.filter(t=>t.status==='ยังไม่เริ่ม').length;
+  const progress = tasks.filter(t=>t.status==='กำลังดำเนินการ').length;
+  const done = tasks.filter(t=>t.status==='เสร็จเรียบร้อย').length;
+  document.getElementById('rTotal').textContent = total;
+  document.getElementById('rPending').textContent = pending;
+  document.getElementById('rProgress').textContent = progress;
+  document.getElementById('rDone').textContent = done;
+  const pct = v => total ? (v/total*100).toFixed(1)+'%' : '0%';
+  document.getElementById('rLegPending').textContent = `${pending} (${pct(pending)})`;
+  document.getElementById('rLegProgress').textContent = `${progress} (${pct(progress)})`;
+  document.getElementById('rLegDone').textContent = `${done} (${pct(done)})`;
+
+  if (donutChart2) donutChart2.destroy();
+  if (barChart2) barChart2.destroy();
+
+  donutChart2 = new Chart(document.getElementById('donutChart2').getContext('2d'), {
+    type:'doughnut',
+    data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false}}}
+  });
+
+  barChart2 = new Chart(document.getElementById('barChart2').getContext('2d'), {
+    type:'bar',
+    data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{label:'จำนวนงาน',data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderRadius:8,borderSkipped:false,maxBarThickness:55}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Sarabun',size:11}},grid:{color:'rgba(61,122,85,0.07)'},border:{display:false}},x:{ticks:{font:{family:'Sarabun',size:11}},grid:{display:false},border:{display:false}}}}
+  });
+}
+
+// ── STATS ──
+function updateStats() {
+  const arr = filteredTasks;
+  const total = arr.length;
+  const pending = arr.filter(t => t.status === 'ยังไม่เริ่ม').length;
+  const progress = arr.filter(t => t.status === 'กำลังดำเนินการ').length;
+  const done = arr.filter(t => t.status === 'เสร็จเรียบร้อย').length;
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statProgress').textContent = progress;
+  document.getElementById('statDone').textContent = done;
+  const pct = v => total ? (v/total*100).toFixed(1)+'%' : '0%';
+  document.getElementById('statPendingPct').textContent = pct(pending);
+  document.getElementById('statProgressPct').textContent = pct(progress);
+  document.getElementById('statDonePct').textContent = pct(done);
+  document.getElementById('legPending').textContent = `${pending} (${pct(pending)})`;
+  document.getElementById('legProgress').textContent = `${progress} (${pct(progress)})`;
+  document.getElementById('legDone').textContent = `${done} (${pct(done)})`;
+}
+
+// ── CHARTS ──
+let donutChart, barChart;
+
+function initCharts() {
+  const arr = tasks;
+  const pending = arr.filter(t => t.status === 'ยังไม่เริ่ม').length;
+  const progress = arr.filter(t => t.status === 'กำลังดำเนินการ').length;
+  const done = arr.filter(t => t.status === 'เสร็จเรียบร้อย').length;
+
+  donutChart = new Chart(document.getElementById('donutChart').getContext('2d'), {
+    type:'doughnut',
+    data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderWidth:0,hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed} งาน`}}}}
+  });
+
+  barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
+    type:'bar',
+    data:{labels:['ยังไม่เริ่ม','กำลังดำเนินการ','เสร็จเรียบร้อย'],datasets:[{label:'จำนวนงาน',data:[pending,progress,done],backgroundColor:[COLORS.pending,COLORS.progress,COLORS.done],borderRadius:8,borderSkipped:false,maxBarThickness:55}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y} งาน`}}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,font:{family:'Sarabun',size:11}},grid:{color:'rgba(61,122,85,0.07)'},border:{display:false}},x:{ticks:{font:{family:'Sarabun',size:11}},grid:{display:false},border:{display:false}}}}
+  });
+}
+
+function updateCharts() {
+  const arr = filteredTasks;
+  const pending = arr.filter(t=>t.status==='ยังไม่เริ่ม').length;
+  const progress = arr.filter(t=>t.status==='กำลังดำเนินการ').length;
+  const done = arr.filter(t=>t.status==='เสร็จเรียบร้อย').length;
+  donutChart.data.datasets[0].data = [pending,progress,done];
+  donutChart.update();
+  barChart.data.datasets[0].data = [pending,progress,done];
+  barChart.update();
+}
+
+// ── MODAL (ADD/EDIT) ──
+function openModal(idx = null) {
+  editIndex = idx;
+  const overlay = document.getElementById('modalOverlay');
+  if (idx !== null) {
+    const t = tasks[idx];
+    document.getElementById('modalTitleText').textContent = 'แก้ไขงาน';
+    document.getElementById('fName').value = t.name;
+    document.getElementById('fStatus').value = t.status;
+    document.getElementById('fDesc').value = t.desc;
+    document.getElementById('fCreator').value = t.creator;
+    document.getElementById('fCreatorEmail').value = t.creatorEmail;
+    document.getElementById('fAssignee').value = t.assignee;
+    document.getElementById('fAssigneeEmail').value = t.assigneeEmail;
+  } else {
+    document.getElementById('modalTitleText').textContent = 'เพิ่มงานใหม่';
+    ['fName','fDesc','fCreator','fCreatorEmail','fAssignee','fAssigneeEmail'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fStatus').value = 'ยังไม่เริ่ม';
+  }
+  overlay.classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+function saveTask() {
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { document.getElementById('fName').focus(); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const task = {
+    id: editIndex !== null ? tasks[editIndex].id : genId(),
+    created: editIndex !== null ? tasks[editIndex].created : today,
+    name,
+    desc: document.getElementById('fDesc').value.trim(),
+    creator: document.getElementById('fCreator').value.trim() || 'ไม่ระบุ',
+    creatorEmail: document.getElementById('fCreatorEmail').value.trim(),
+    assignee: document.getElementById('fAssignee').value.trim() || 'ไม่ระบุ',
+    assigneeEmail: document.getElementById('fAssigneeEmail').value.trim(),
+    status: document.getElementById('fStatus').value,
+    updated: today
+  };
+  if (editIndex !== null) tasks[editIndex] = task;
+  else tasks.unshift(task);
+  closeModal();
+  filteredTasks = [...tasks];
+  renderTable(); updateStats(); updateCharts();
+  showToast(editIndex !== null ? 'แก้ไขงานสำเร็จ' : 'เพิ่มงานใหม่สำเร็จ');
+}
+
+function editTask(idx) {
+  openWithPassword(() => openModal(idx));
+}
+
+function deleteTask(idx) {
+  if (!confirm(`ยืนยันลบงาน "${tasks[idx].name}" ?`)) return;
+  tasks.splice(idx, 1);
+  filteredTasks = [...tasks];
+  filteredTasks2 = [...tasks];
+  renderTable(); renderTable2(); updateStats(); updateCharts();
+  showToast('ลบงานสำเร็จ');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── EXPORT ──
+function exportData() {
+  const cols = ['created','id','name','desc','creator','creatorEmail','assignee','assigneeEmail','status','updated'];
+  const headers = ['วันที่สร้าง','ID งาน','ชื่องาน','รายละเอียด','สร้างโดย','อีเมลผู้สร้าง','ผู้รับผิดชอบ','อีเมลผู้รับผิดชอบ','สถานะ','แก้ไขล่าสุด'];
+  const rows = [headers, ...filteredTasks.map(t => cols.map(c => `"${(t[c]||'').replace(/"/g,'""')}"` ))];
+  const csv = '\uFEFF' + rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = `task_export_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('ส่งออก CSV สำเร็จ');
+}
+
+// ── INIT ──
+filteredTasks = [...tasks];
+filteredTasks2 = [...tasks];
+renderTable();
+updateStats();
+window.addEventListener('load', initCharts);
+</script>
+</body>
+</html>
